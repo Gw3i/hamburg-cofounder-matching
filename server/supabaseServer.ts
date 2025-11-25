@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 // Server-side Supabase client using anon key with RLS policies
 // This respects Row Level Security, which is the recommended approach
@@ -10,7 +10,9 @@ export function getSupabaseClient() {
     const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      console.warn('[Supabase] Missing credentials. Database operations will fail.');
+      console.warn(
+        "[Supabase] Missing credentials. Database operations will fail."
+      );
       return null;
     }
 
@@ -31,7 +33,9 @@ export function getSupabaseClientForUser(accessToken: string) {
   const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    console.warn('[Supabase] Missing credentials. Database operations will fail.');
+    console.warn(
+      "[Supabase] Missing credentials. Database operations will fail."
+    );
     return null;
   }
 
@@ -54,8 +58,14 @@ export interface FounderProfile {
   user_id: string;
   name: string;
   age: number | null;
-  current_occupation: 'student' | 'working_full_time' | 'working_part_time_on_idea' | 'working_full_time_on_idea' | 'between_jobs' | null;
-  time_commitment: 'full_time' | 'part_time' | 'exploring' | null;
+  current_occupation:
+    | "student"
+    | "working_full_time"
+    | "working_part_time_on_idea"
+    | "working_full_time_on_idea"
+    | "between_jobs"
+    | null;
+  time_commitment: "full_time" | "part_time" | "exploring" | null;
   is_technical: boolean | null;
   has_idea: boolean | null;
   skill_areas: string[] | null;
@@ -74,8 +84,13 @@ export interface InsertFounderProfile {
   user_id: string;
   name: string;
   age?: number | null;
-  current_occupation: 'student' | 'working_full_time' | 'working_part_time_on_idea' | 'working_full_time_on_idea' | 'between_jobs';
-  time_commitment: 'full_time' | 'part_time' | 'exploring';
+  current_occupation:
+    | "student"
+    | "working_full_time"
+    | "working_part_time_on_idea"
+    | "working_full_time_on_idea"
+    | "between_jobs";
+  time_commitment: "full_time" | "part_time" | "exploring";
   is_technical: boolean;
   has_idea: boolean;
   skill_areas: string[];
@@ -88,27 +103,29 @@ export interface InsertFounderProfile {
 }
 
 // Database operations using RLS-protected client
-export async function getFounderProfileByUserId(userId: string): Promise<FounderProfile | null> {
+export async function getFounderProfileByUserId(
+  userId: string
+): Promise<FounderProfile | null> {
   const supabase = getSupabaseClient();
   if (!supabase) return null;
 
   const { data, error } = await supabase
-    .from('founder_profiles')
-    .select('*')
-    .eq('user_id', userId)
+    .from("founder_profiles")
+    .select("*")
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (error) {
-    console.error('[Supabase] Error fetching profile:', error);
+    console.error("[Supabase] Error fetching profile:", error);
     throw new Error(error.message);
   }
 
   // Update last_active_at timestamp when profile is viewed
   if (data) {
     await supabase
-      .from('founder_profiles')
+      .from("founder_profiles")
       .update({ last_active_at: new Date().toISOString() })
-      .eq('user_id', userId);
+      .eq("user_id", userId);
   }
 
   return data;
@@ -120,35 +137,33 @@ export async function upsertFounderProfile(
 ): Promise<void> {
   const supabase = getSupabaseClientForUser(accessToken);
   if (!supabase) {
-    throw new Error('Supabase client not available');
+    throw new Error("Supabase client not available");
   }
 
-  const { error } = await supabase
-    .from('founder_profiles')
-    .upsert(
-      {
-        user_id: profile.user_id,
-        name: profile.name,
-        age: profile.age,
-        current_occupation: profile.current_occupation,
-        time_commitment: profile.time_commitment,
-        is_technical: profile.is_technical,
-        has_idea: profile.has_idea,
-        skill_areas: profile.skill_areas,
-        idea: profile.idea,
-        looking_for: profile.looking_for,
-        skills: profile.skills,
-        linked_in: profile.linked_in,
-        photo_url: profile.photo_url,
-        profile_completed: profile.profile_completed ?? true,
-      },
-      {
-        onConflict: 'user_id',
-      }
-    );
+  const { error } = await supabase.from("founder_profiles").upsert(
+    {
+      user_id: profile.user_id,
+      name: profile.name,
+      age: profile.age,
+      current_occupation: profile.current_occupation,
+      time_commitment: profile.time_commitment,
+      is_technical: profile.is_technical,
+      has_idea: profile.has_idea,
+      skill_areas: profile.skill_areas,
+      idea: profile.idea,
+      looking_for: profile.looking_for,
+      skills: profile.skills,
+      linked_in: profile.linked_in,
+      photo_url: profile.photo_url,
+      profile_completed: profile.profile_completed ?? true,
+    },
+    {
+      onConflict: "user_id",
+    }
+  );
 
   if (error) {
-    console.error('[Supabase] Error upserting profile:', error);
+    console.error("[Supabase] Error upserting profile:", error);
     throw new Error(error.message);
   }
 }
@@ -173,22 +188,25 @@ export async function getAllFounderProfiles(
   if (!supabase) return [];
 
   let query = supabase
-    .from('founder_profiles')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .from("founder_profiles")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   // Apply pagination if provided
   if (params?.limit) {
     query = query.limit(params.limit);
   }
   if (params?.offset) {
-    query = query.range(params.offset, params.offset + (params.limit || 10) - 1);
+    query = query.range(
+      params.offset,
+      params.offset + (params.limit || 10) - 1
+    );
   }
 
   const { data, error } = await query;
 
   if (error) {
-    console.error('[Supabase] Error fetching profiles:', error);
+    console.error("[Supabase] Error fetching profiles:", error);
     throw new Error(error.message);
   }
 
@@ -214,11 +232,11 @@ export async function getFounderProfilesWithPagination(
 
   // Get total count
   const { count, error: countError } = await supabase
-    .from('founder_profiles')
-    .select('*', { count: 'exact', head: true });
+    .from("founder_profiles")
+    .select("*", { count: "exact", head: true });
 
   if (countError) {
-    console.error('[Supabase] Error counting profiles:', countError);
+    console.error("[Supabase] Error counting profiles:", countError);
     throw new Error(countError.message);
   }
 
@@ -226,13 +244,13 @@ export async function getFounderProfilesWithPagination(
 
   // Get paginated data
   const { data, error } = await supabase
-    .from('founder_profiles')
-    .select('*')
-    .order('created_at', { ascending: false })
+    .from("founder_profiles")
+    .select("*")
+    .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) {
-    console.error('[Supabase] Error fetching profiles:', error);
+    console.error("[Supabase] Error fetching profiles:", error);
     throw new Error(error.message);
   }
 
@@ -250,11 +268,11 @@ export async function getTotalProfileCount(): Promise<number> {
   if (!supabase) return 0;
 
   const { count, error } = await supabase
-    .from('founder_profiles')
-    .select('*', { count: 'exact', head: true });
+    .from("founder_profiles")
+    .select("*", { count: "exact", head: true });
 
   if (error) {
-    console.error('[Supabase] Error counting profiles:', error);
+    console.error("[Supabase] Error counting profiles:", error);
     throw new Error(error.message);
   }
 
@@ -270,31 +288,31 @@ export async function uploadProfilePhoto(
 ): Promise<string> {
   const supabase = getSupabaseClientForUser(accessToken);
   if (!supabase) {
-    throw new Error('Supabase client not available');
+    throw new Error("Supabase client not available");
   }
 
   // Create unique file path
   const timestamp = Date.now();
   const randomStr = Math.random().toString(36).substring(7);
-  const ext = fileName.split('.').pop();
+  const ext = fileName.split(".").pop();
   const filePath = `${userId}/${timestamp}-${randomStr}.${ext}`;
 
   // Upload to Supabase Storage
   const { data, error } = await supabase.storage
-    .from('profile-photos')
+    .from("profile-photos")
     .upload(filePath, fileBuffer, {
       contentType,
       upsert: false,
     });
 
   if (error) {
-    console.error('[Supabase] Error uploading photo:', error);
+    console.error("[Supabase] Error uploading photo:", error);
     throw new Error(error.message);
   }
 
   // Get public URL
   const { data: urlData } = supabase.storage
-    .from('profile-photos')
+    .from("profile-photos")
     .getPublicUrl(data.path);
 
   return urlData.publicUrl;
@@ -306,14 +324,14 @@ export async function deleteFounderProfile(
 ): Promise<void> {
   const supabase = getSupabaseClientForUser(accessToken);
   if (!supabase) {
-    throw new Error('Supabase client not available');
+    throw new Error("Supabase client not available");
   }
 
   // First, get the profile to check for photo_url
   const { data: profile } = await supabase
-    .from('founder_profiles')
-    .select('photo_url')
-    .eq('user_id', userId)
+    .from("founder_profiles")
+    .select("photo_url")
+    .eq("user_id", userId)
     .single();
 
   // Delete profile photo from storage if it exists
@@ -321,27 +339,25 @@ export async function deleteFounderProfile(
     try {
       // Extract file path from URL
       const url = new URL(profile.photo_url);
-      const pathParts = url.pathname.split('/profile-photos/');
+      const pathParts = url.pathname.split("/profile-photos/");
       if (pathParts.length > 1) {
         const filePath = pathParts[1];
-        await supabase.storage
-          .from('profile-photos')
-          .remove([filePath]);
+        await supabase.storage.from("profile-photos").remove([filePath]);
       }
     } catch (error) {
-      console.error('[Supabase] Error deleting profile photo:', error);
+      console.error("[Supabase] Error deleting profile photo:", error);
       // Continue with profile deletion even if photo deletion fails
     }
   }
 
   // Delete the profile record
   const { error } = await supabase
-    .from('founder_profiles')
+    .from("founder_profiles")
     .delete()
-    .eq('user_id', userId);
+    .eq("user_id", userId);
 
   if (error) {
-    console.error('[Supabase] Error deleting profile:', error);
+    console.error("[Supabase] Error deleting profile:", error);
     throw new Error(error.message);
   }
 
