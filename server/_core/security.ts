@@ -75,19 +75,27 @@ export function setupSecurityMiddleware(app: Express) {
     },
   }));
 
-  // HTTPS Enforcement in Production
+  // HTTPS Enforcement in Production (skip for localhost)
   if (isProduction) {
     app.use((req, res, next) => {
+      // Skip HTTPS enforcement for localhost (development/testing)
+      const isLocalhost = req.headers.host?.includes('localhost') ||
+                         req.headers.host?.includes('127.0.0.1');
+
+      if (isLocalhost) {
+        return next();
+      }
+
       // Check if request is already HTTPS
-      const isHttps = req.secure || 
+      const isHttps = req.secure ||
                       req.headers['x-forwarded-proto'] === 'https' ||
                       req.headers['x-forwarded-ssl'] === 'on';
-      
+
       if (!isHttps) {
         // Redirect HTTP to HTTPS
         return res.redirect(301, `https://${req.headers.host}${req.url}`);
       }
-      
+
       next();
     });
   }

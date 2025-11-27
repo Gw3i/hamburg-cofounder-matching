@@ -163,7 +163,6 @@ Optional:
 
 - `PORT` - Server port (default: 3000)
 - `FRONTEND_URL` - Frontend URL for CORS
-- `SENTRY_DSN` - Error tracking
 - `LOG_LEVEL` - Logging verbosity
 
 ### Security Features

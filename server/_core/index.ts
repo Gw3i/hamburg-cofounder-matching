@@ -1,17 +1,16 @@
+import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
-import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
-import { serveStatic, setupVite } from "./vite";
-import { validateEnvironment } from "./validateEnv";
-import { setupSecurityMiddleware } from "./security";
-import { apiLimiter, authLimiter } from "./rateLimiting";
-import { setupSentry, setupSentryErrorHandler } from "./sentry";
 import { logger } from "./logger";
+import { registerOAuthRoutes } from "./oauth";
+import { apiLimiter, authLimiter } from "./rateLimiting";
+import { setupSecurityMiddleware } from "./security";
+import { validateEnvironment } from "./validateEnv";
+import { serveStatic, setupVite } from "./vite";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -39,15 +38,12 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Initialize Sentry (must be first)
-  setupSentry(app);
-
   // Security middleware (CORS, Helmet, HTTPS)
   setupSecurityMiddleware(app);
 
   // Rate limiting
-  app.use('/api/', apiLimiter);
-  app.use('/api/oauth/', authLimiter);
+  app.use("/api/", apiLimiter);
+  app.use("/api/oauth/", authLimiter);
 
   // Configure body parser with 10MB limit (reduced from 50MB for security)
   app.use(express.json({ limit: "10mb" }));
@@ -68,9 +64,6 @@ async function startServer() {
   } else {
     serveStatic(app);
   }
-
-  // Sentry error handler (must be after routes)
-  setupSentryErrorHandler(app);
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
