@@ -113,7 +113,7 @@ export default function Privacy() {
               <li><strong>right to withdraw consent (art. 7(3) gdpr):</strong> withdraw your consent at any time by deleting your account</li>
             </ul>
             <p className="lowercase mb-4">
-              to exercise any of these rights, please contact us at [your-email@example.com]. we will respond to your request within one month.
+              to exercise any of these rights, please contact us at v.nyzhashchyy@gmail.com. we will respond to your request within one month.
             </p>
 
             <h2 className="text-xl font-semibold lowercase mt-8 mb-4">8. cookies and tracking</h2>
@@ -163,7 +163,7 @@ export default function Privacy() {
             <h2 className="text-xl font-semibold lowercase mt-8 mb-4">15. contact us</h2>
             <p className="lowercase mb-4">
               if you have any questions about this privacy policy or wish to exercise your gdpr rights, please contact us at:<br />
-              email: [your-email@example.com]
+              email: v.nyzhashchyy@gmail.com
             </p>
           </div>
         </main>
