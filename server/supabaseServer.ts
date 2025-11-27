@@ -1,4 +1,10 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import {
+  FounderProfile,
+  InsertFounderProfile,
+  PaginatedResponse,
+  PaginationParams,
+} from "./types/supabase.types";
 
 // Server-side Supabase client using anon key with RLS policies
 // This respects Row Level Security, which is the recommended approach
@@ -50,56 +56,6 @@ export function getSupabaseClientForUser(accessToken: string) {
       persistSession: false,
     },
   });
-}
-
-// Types for founder profiles
-export interface FounderProfile {
-  id: string;
-  user_id: string;
-  name: string;
-  age: number | null;
-  current_occupation:
-    | "student"
-    | "working_full_time"
-    | "working_part_time_on_idea"
-    | "working_full_time_on_idea"
-    | "between_jobs"
-    | null;
-  time_commitment: "full_time" | "part_time" | "exploring" | null;
-  is_technical: boolean | null;
-  has_idea: boolean | null;
-  skill_areas: string[] | null;
-  idea: string | null;
-  looking_for: string | null;
-  skills: string | null;
-  linked_in: string | null;
-  photo_url: string | null;
-  profile_completed: boolean | null;
-  created_at: string;
-  updated_at: string;
-  last_active_at: string;
-}
-
-export interface InsertFounderProfile {
-  user_id: string;
-  name: string;
-  age?: number | null;
-  current_occupation:
-    | "student"
-    | "working_full_time"
-    | "working_part_time_on_idea"
-    | "working_full_time_on_idea"
-    | "between_jobs";
-  time_commitment: "full_time" | "part_time" | "exploring";
-  is_technical: boolean;
-  has_idea: boolean;
-  skill_areas: string[];
-  idea?: string | null;
-  looking_for?: string | null;
-  skills?: string | null;
-  linked_in?: string | null;
-  photo_url?: string | null;
-  profile_completed?: boolean;
 }
 
 // Database operations using RLS-protected client
@@ -168,19 +124,6 @@ export async function upsertFounderProfile(
   }
 }
 
-export interface PaginationParams {
-  limit?: number;
-  offset?: number;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  limit: number;
-  offset: number;
-  hasMore: boolean;
-}
-
 export async function getAllFounderProfiles(
   params?: PaginationParams
 ): Promise<FounderProfile[]> {
@@ -190,6 +133,7 @@ export async function getAllFounderProfiles(
   let query = supabase
     .from("founder_profiles")
     .select("*")
+    .eq("profile_completed", true)
     .order("created_at", { ascending: false });
 
   // Apply pagination if provided
@@ -230,10 +174,11 @@ export async function getFounderProfilesWithPagination(
   const limit = params.limit || 20;
   const offset = params.offset || 0;
 
-  // Get total count
+  // Get total count of completed profiles only
   const { count, error: countError } = await supabase
     .from("founder_profiles")
-    .select("*", { count: "exact", head: true });
+    .select("*", { count: "exact", head: true })
+    .eq("profile_completed", true);
 
   if (countError) {
     console.error("[Supabase] Error counting profiles:", countError);
@@ -242,10 +187,14 @@ export async function getFounderProfilesWithPagination(
 
   const total = count || 0;
 
-  // Get paginated data
+  // Get paginated data - only completed profiles
+  console.log(
+    "[Supabase] Fetching profiles with filter: profile_completed = true"
+  );
   const { data, error } = await supabase
     .from("founder_profiles")
     .select("*")
+    .eq("profile_completed", true)
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -269,7 +218,8 @@ export async function getTotalProfileCount(): Promise<number> {
 
   const { count, error } = await supabase
     .from("founder_profiles")
-    .select("*", { count: "exact", head: true });
+    .select("*", { count: "exact", head: true })
+    .eq("profile_completed", true);
 
   if (error) {
     console.error("[Supabase] Error counting profiles:", error);
