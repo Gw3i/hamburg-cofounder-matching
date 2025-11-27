@@ -39,13 +39,13 @@ export function MultiSelect({
 
   const handleSelect = (optionValue: string) => {
     const newValue = value.includes(optionValue)
-      ? value.filter((v) => v !== optionValue)
+      ? value.filter(v => v !== optionValue)
       : [...value, optionValue];
     onChange(newValue);
   };
 
   const handleRemove = (optionValue: string) => {
-    onChange(value.filter((v) => v !== optionValue));
+    onChange(value.filter(v => v !== optionValue));
   };
 
   const handleClear = () => {
@@ -53,7 +53,7 @@ export function MultiSelect({
   };
 
   const selectedLabels = value.map(
-    (v) => options.find((opt) => opt.value === v)?.label || v
+    v => options.find(opt => opt.value === v)?.label || v
   );
 
   return (
@@ -71,14 +71,16 @@ export function MultiSelect({
         >
           <div className="flex flex-wrap gap-1 w-full items-center">
             {value.length === 0 ? (
-              <span className="text-muted-foreground lowercase">{placeholder}</span>
+              <span className="text-muted-foreground lowercase">
+                {placeholder}
+              </span>
             ) : value.length <= 2 ? (
               selectedLabels.map((label, index) => (
                 <Badge
                   key={value[index]}
                   variant="secondary"
                   className="lowercase text-xs"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     handleRemove(value[index]);
                   }}
@@ -88,16 +90,14 @@ export function MultiSelect({
                 </Badge>
               ))
             ) : (
-              <span className="lowercase text-sm">
-                {value.length} selected
-              </span>
+              <span className="lowercase text-sm">{value.length} selected</span>
             )}
           </div>
           <div className="flex items-center gap-1">
             {value.length > 0 && (
               <X
                 className="h-4 w-4 opacity-50 hover:opacity-100"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   handleClear();
                 }}
@@ -111,7 +111,7 @@ export function MultiSelect({
         <Command>
           <CommandList>
             <CommandGroup>
-              {options.map((option) => (
+              {options.map(option => (
                 <CommandItem
                   key={option.value}
                   value={option.label}
@@ -121,9 +121,7 @@ export function MultiSelect({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value.includes(option.value)
-                        ? "opacity-100"
-                        : "opacity-0"
+                      value.includes(option.value) ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {option.label}

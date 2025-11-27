@@ -23,11 +23,11 @@ import { APP_TITLE, getLoginUrl } from "@/const";
 import { LogoIcon } from "@/components/LogoIcon";
 import { useIsMobile } from "@/hooks/useMobile";
 import { useSupabaseAuth } from "@/contexts/SupabaseAuthContext";
-import type { User } from '@supabase/supabase-js';
+import type { User } from "@supabase/supabase-js";
 import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
+import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { Button } from "./ui/button";
 
 const menuItems = [
@@ -57,7 +57,7 @@ export default function DashboardLayout({
   }, [sidebarWidth]);
 
   if (loading) {
-    return <DashboardLayoutSkeleton />
+    return <DashboardLayoutSkeleton />;
   }
 
   if (!user) {
@@ -241,7 +241,9 @@ function DashboardLayoutContent({
                   </Avatar>
                   <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
                     <p className="text-sm font-medium truncate leading-none">
-                      {supabaseUser?.user_metadata?.name || supabaseUser?.email?.split('@')[0] || "-"}
+                      {supabaseUser?.user_metadata?.name ||
+                        supabaseUser?.email?.split("@")[0] ||
+                        "-"}
                     </p>
                     <p className="text-xs text-muted-foreground truncate mt-1.5">
                       {supabaseUser?.email || "-"}

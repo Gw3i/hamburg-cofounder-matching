@@ -43,19 +43,19 @@
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
   @keyframes marquee {
-  from {
-    transform: translateX(0);
+    from {
+      transform: translateX(0);
     }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
     }
   }
   @keyframes marquee-vertical {
-  from {
-    transform: translateY(0);
+    from {
+      transform: translateY(0);
     }
-  to {
-    transform: translateY(calc(-100% - var(--gap)));
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
     }
   }
 }
@@ -112,7 +112,7 @@
   --muted: oklch(0.274 0.006 286.033);
   --muted-foreground: oklch(0.705 0.015 286.067);
   --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
+  --accent-foreground: oklch(0.92 0.005 65);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 10%);
@@ -126,7 +126,7 @@
   --sidebar: oklch(0.21 0.006 285.885);
   --sidebar-foreground: oklch(0.85 0.005 65);
   --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.488 0.243 264.376);
 }
@@ -136,14 +136,18 @@
   .dot-grid-background {
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(circle, oklch(0.235 0.015 65 / 0.15) 1px, transparent 1px);
+    background-image: radial-gradient(
+      circle,
+      oklch(0.235 0.015 65 / 0.15) 1px,
+      transparent 1px
+    );
     background-size: 24px 24px;
     animation: dotGridMove 20s linear infinite;
   }
 
   /* Fade overlay using pseudo-element - Light mode */
   .dot-grid-background::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(
@@ -255,12 +259,16 @@
   }
 
   .thin-scrollbar::-webkit-scrollbar-thumb {
-    background: oklch(0.705 0.015 286.067 / 0.3); /* muted-foreground with low opacity */
+    background: oklch(
+      0.705 0.015 286.067 / 0.3
+    ); /* muted-foreground with low opacity */
     border-radius: 2px;
   }
 
   .thin-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.705 0.015 286.067 / 0.5); /* muted-foreground with higher opacity */
+    background: oklch(
+      0.705 0.015 286.067 / 0.5
+    ); /* muted-foreground with higher opacity */
   }
 
   /* Firefox thin scrollbar */

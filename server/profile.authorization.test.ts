@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 
 /**
  * Authorization Tests - November 2025 Best Practices
- * 
+ *
  * Tests that users can only access and modify their own data
  */
 
@@ -14,10 +14,10 @@ function createMockContext(userId: string): TrpcContext {
     user: {
       id: userId,
       email: `${userId}@example.com`,
-      accessToken: 'mock-access-token',
+      accessToken: "mock-access-token",
     },
     req: {
-      protocol: 'https',
+      protocol: "https",
       headers: {},
     } as TrpcContext["req"],
     res: {} as TrpcContext["res"],
@@ -28,7 +28,7 @@ function createUnauthenticatedContext(): TrpcContext {
   return {
     user: null,
     req: {
-      protocol: 'https',
+      protocol: "https",
       headers: {},
     } as TrpcContext["req"],
     res: {} as TrpcContext["res"],
@@ -58,7 +58,7 @@ describe("Profile Authorization", () => {
         });
       } catch (error: any) {
         // Should NOT be a FORBIDDEN error (authorization passed)
-        expect(error.code).not.toBe('FORBIDDEN');
+        expect(error.code).not.toBe("FORBIDDEN");
       }
     });
 
@@ -81,11 +81,11 @@ describe("Profile Authorization", () => {
           skill_areas: ["business"],
         });
         // Should not reach here
-        expect.fail('Expected FORBIDDEN error');
+        expect.fail("Expected FORBIDDEN error");
       } catch (error: any) {
         // Should be a FORBIDDEN error
-        expect(error.code).toBe('FORBIDDEN');
-        expect(error.message).toContain('only modify your own profile');
+        expect(error.code).toBe("FORBIDDEN");
+        expect(error.message).toContain("only modify your own profile");
       }
     });
 
@@ -107,10 +107,10 @@ describe("Profile Authorization", () => {
           skill_areas: ["business"],
         });
         // Should not reach here
-        expect.fail('Expected UNAUTHORIZED error');
+        expect.fail("Expected UNAUTHORIZED error");
       } catch (error: any) {
         // Should be an UNAUTHORIZED error
-        expect(error.code).toBe('UNAUTHORIZED');
+        expect(error.code).toBe("UNAUTHORIZED");
       }
     });
   });
@@ -125,12 +125,13 @@ describe("Profile Authorization", () => {
       try {
         await caller.profile.uploadPhoto({
           userId,
-          photoData: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+          photoData:
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
           mimeType: "image/png",
         });
       } catch (error: any) {
         // Should NOT be a FORBIDDEN error (authorization passed)
-        expect(error.code).not.toBe('FORBIDDEN');
+        expect(error.code).not.toBe("FORBIDDEN");
       }
     });
 
@@ -144,15 +145,16 @@ describe("Profile Authorization", () => {
       try {
         await caller.profile.uploadPhoto({
           userId: otherUserId, // Different user ID
-          photoData: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+          photoData:
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
           mimeType: "image/png",
         });
         // Should not reach here
-        expect.fail('Expected FORBIDDEN error');
+        expect.fail("Expected FORBIDDEN error");
       } catch (error: any) {
         // Should be a FORBIDDEN error
-        expect(error.code).toBe('FORBIDDEN');
-        expect(error.message).toContain('only upload your own photo');
+        expect(error.code).toBe("FORBIDDEN");
+        expect(error.message).toContain("only upload your own photo");
       }
     });
 
@@ -165,14 +167,15 @@ describe("Profile Authorization", () => {
       try {
         await caller.profile.uploadPhoto({
           userId,
-          photoData: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+          photoData:
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
           mimeType: "image/png",
         });
         // Should not reach here
-        expect.fail('Expected UNAUTHORIZED error');
+        expect.fail("Expected UNAUTHORIZED error");
       } catch (error: any) {
         // Should be an UNAUTHORIZED error
-        expect(error.code).toBe('UNAUTHORIZED');
+        expect(error.code).toBe("UNAUTHORIZED");
       }
     });
   });
@@ -190,7 +193,7 @@ describe("Profile Authorization", () => {
         });
       } catch (error: any) {
         // Should NOT be a FORBIDDEN error (authorization passed)
-        expect(error.code).not.toBe('FORBIDDEN');
+        expect(error.code).not.toBe("FORBIDDEN");
       }
     });
 
@@ -206,11 +209,11 @@ describe("Profile Authorization", () => {
           supabaseId: otherUserId, // Different user ID
         });
         // Should not reach here
-        expect.fail('Expected FORBIDDEN error');
+        expect.fail("Expected FORBIDDEN error");
       } catch (error: any) {
         // Should be a FORBIDDEN error
-        expect(error.code).toBe('FORBIDDEN');
-        expect(error.message).toContain('only delete your own profile');
+        expect(error.code).toBe("FORBIDDEN");
+        expect(error.message).toContain("only delete your own profile");
       }
     });
 
@@ -225,10 +228,10 @@ describe("Profile Authorization", () => {
           supabaseId: userId,
         });
         // Should not reach here
-        expect.fail('Expected UNAUTHORIZED error');
+        expect.fail("Expected UNAUTHORIZED error");
       } catch (error: any) {
         // Should be an UNAUTHORIZED error
-        expect(error.code).toBe('UNAUTHORIZED');
+        expect(error.code).toBe("UNAUTHORIZED");
       }
     });
   });
@@ -255,9 +258,7 @@ describe("Profile Authorization", () => {
       const caller = appRouter.createCaller(ctx);
 
       // This should not throw - profile.list is public
-      await expect(
-        caller.profile.list({})
-      ).resolves.toBeDefined();
+      await expect(caller.profile.list({})).resolves.toBeDefined();
     });
   });
 });

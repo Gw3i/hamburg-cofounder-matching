@@ -1,6 +1,6 @@
-import { FOUNDER_SKILLS } from '@/lib/founderSkills';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import { FOUNDER_SKILLS } from "@/lib/founderSkills";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 interface SkillPickerProps {
   selectedSkills: string[];
@@ -18,7 +18,7 @@ export function SkillPicker({ selectedSkills, onChange }: SkillPickerProps) {
 
   return (
     <div className="space-y-3">
-      {FOUNDER_SKILLS.map((skill) => (
+      {FOUNDER_SKILLS.map(skill => (
         <div key={skill.value} className="flex items-start space-x-3">
           <Checkbox
             id={skill.value}
@@ -32,9 +32,7 @@ export function SkillPicker({ selectedSkills, onChange }: SkillPickerProps) {
             >
               {skill.label}
             </Label>
-            <p className="text-sm text-muted-foreground">
-              {skill.description}
-            </p>
+            <p className="text-sm text-muted-foreground">{skill.description}</p>
           </div>
         </div>
       ))}

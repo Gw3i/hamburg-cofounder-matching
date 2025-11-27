@@ -1,5 +1,5 @@
+import { createClient } from "@supabase/supabase-js";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
-import { createClient } from '@supabase/supabase-js';
 
 export type SupabaseUser = {
   id: string;
@@ -20,17 +20,17 @@ export async function createContext(
   const authHeader = opts.req.headers.authorization;
   let user: SupabaseUser | null = null;
 
-  if (authHeader && authHeader.startsWith('Bearer ')) {
+  if (authHeader && authHeader.startsWith("Bearer ")) {
     const accessToken = authHeader.substring(7);
-    
+
     // Verify token with Supabase
     const supabaseUrl = process.env.VITE_SUPABASE_URL;
     const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
-    
+
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey);
       const { data, error } = await supabase.auth.getUser(accessToken);
-      
+
       if (!error && data.user) {
         user = {
           id: data.user.id,

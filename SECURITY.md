@@ -4,10 +4,10 @@
 
 We release patches for security vulnerabilities. Which versions are eligible for receiving such patches depends on the CVSS v3.0 Rating:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x.x   | ✅ |
-| < 1.0   | ❌ |
+| Version | Supported |
+| ------- | --------- |
+| 1.x.x   | ✅        |
+| < 1.0   | ❌        |
 
 ## Reporting a Vulnerability
 
@@ -56,24 +56,28 @@ To report a security vulnerability, please follow these steps:
 Our platform implements multiple layers of security:
 
 #### Authentication & Authorization
+
 - JWT-based authentication via Supabase
 - Row Level Security (RLS) policies for data access control
 - Session management with secure token handling
 - Protected API endpoints with role-based access
 
 #### Data Protection
+
 - All data transmission over HTTPS
 - Environment variables for sensitive configuration
 - No storage of sensitive data in code repositories
 - Encrypted database connections
 
 #### API Security
+
 - Rate limiting to prevent abuse
 - Input validation using Zod schemas
 - CORS configuration for controlled access
 - Security headers via Helmet.js
 
 #### Code Security
+
 - Regular dependency updates
 - Automated security scanning in CI/CD
 - Code reviews for all pull requests
@@ -116,6 +120,7 @@ Security updates will be released as:
 - **Major versions**: For significant security overhauls
 
 Subscribe to our security announcements by:
+
 - Watching this repository
 - Following our security advisory page
 - Joining our mailing list (coming soon)
@@ -149,7 +154,7 @@ We maintain a hall of fame for security researchers who have responsibly disclos
 
 ### Hall of Fame
 
-*No vulnerabilities reported yet - be the first!*
+_No vulnerabilities reported yet - be the first!_
 
 ---
 
@@ -167,6 +172,6 @@ We maintain a hall of fame for security researchers who have responsibly disclos
 
 ---
 
-*Last updated: November 2025*
+_Last updated: November 2025_
 
 Thank you for helping keep the Hamburg Cofounder Platform and our users safe!

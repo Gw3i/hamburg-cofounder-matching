@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session, AuthError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { createContext, useContext, useEffect, useState } from "react";
+import { User, Session, AuthError } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 
 interface SupabaseAuthContextType {
   user: User | null;
@@ -13,9 +13,15 @@ interface SupabaseAuthContextType {
   signOut: () => Promise<void>;
 }
 
-const SupabaseAuthContext = createContext<SupabaseAuthContextType | undefined>(undefined);
+const SupabaseAuthContext = createContext<SupabaseAuthContextType | undefined>(
+  undefined
+);
 
-export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
+export function SupabaseAuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +49,10 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
   const signInWithEmail = async (email: string, password: string) => {
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) {
       setError(error);
       throw error;
@@ -56,16 +65,15 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       email,
       password,
       options: {
-        emailRedirectTo: import.meta.env.VITE_PRODUCTION_URL || `${window.location.origin}`,
-      }
+        emailRedirectTo:
+          import.meta.env.VITE_PRODUCTION_URL || `${window.location.origin}`,
+      },
     });
     if (error) {
       setError(error);
       throw error;
     }
   };
-
-
 
   const signOut = async () => {
     setError(null);
@@ -96,7 +104,9 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 export function useSupabaseAuth() {
   const context = useContext(SupabaseAuthContext);
   if (context === undefined) {
-    throw new Error('useSupabaseAuth must be used within a SupabaseAuthProvider');
+    throw new Error(
+      "useSupabaseAuth must be used within a SupabaseAuthProvider"
+    );
   }
   return context;
 }

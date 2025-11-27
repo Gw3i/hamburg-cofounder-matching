@@ -4,7 +4,7 @@ import type { TrpcContext } from "./_core/context";
 
 /**
  * Pagination Tests - November 2025 Best Practices
- * 
+ *
  * Tests server-side pagination for profile list
  */
 
@@ -12,7 +12,7 @@ function createUnauthenticatedContext(): TrpcContext {
   return {
     user: null,
     req: {
-      protocol: 'https',
+      protocol: "https",
       headers: {},
     } as TrpcContext["req"],
     res: {} as TrpcContext["res"],
@@ -28,11 +28,11 @@ describe("Profile List Pagination", () => {
       const result = await caller.profile.list({});
 
       // Should have pagination structure
-      expect(result).toHaveProperty('data');
-      expect(result).toHaveProperty('total');
-      expect(result).toHaveProperty('limit');
-      expect(result).toHaveProperty('offset');
-      expect(result).toHaveProperty('hasMore');
+      expect(result).toHaveProperty("data");
+      expect(result).toHaveProperty("total");
+      expect(result).toHaveProperty("limit");
+      expect(result).toHaveProperty("offset");
+      expect(result).toHaveProperty("hasMore");
 
       // Default values
       expect(result.limit).toBe(20);
@@ -146,7 +146,9 @@ describe("Profile List Pagination", () => {
         });
 
         // Should not include the filtered user
-        const hasFilteredUser = filtered.data.some(p => p.user_id === firstUserId);
+        const hasFilteredUser = filtered.data.some(
+          p => p.user_id === firstUserId
+        );
         expect(hasFilteredUser).toBe(false);
       }
     });
