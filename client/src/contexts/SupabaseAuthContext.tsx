@@ -52,7 +52,13 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
   const signUpWithEmail = async (email: string, password: string) => {
     setError(null);
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: import.meta.env.VITE_PRODUCTION_URL || `${window.location.origin}`,
+      }
+    });
     if (error) {
       setError(error);
       throw error;
