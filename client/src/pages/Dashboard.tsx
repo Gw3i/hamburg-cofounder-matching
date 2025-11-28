@@ -1,4 +1,5 @@
 import { DotGridBackground } from "@/components/DotGridBackground";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { LogoIcon } from "@/components/LogoIcon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ import {
   ExternalLink,
   Lightbulb,
   Linkedin,
+  MessageSquare,
   Search,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -46,6 +48,7 @@ export default function Dashboard() {
   const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(20);
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
 
   const { data: paginatedResult, isLoading } = trpc.profile.list.useQuery(
     {
@@ -75,16 +78,9 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user || authLoading || hasCheckedProfile) return;
 
-    console.log("[Dashboard] Checking profile completion:", {
-      profile: currentUserProfile,
-      profile_completed: currentUserProfile?.profile_completed,
-      current_occupation: currentUserProfile?.current_occupation,
-      time_commitment: currentUserProfile?.time_commitment,
-    });
 
     // No profile exists yet - redirect to create one
     if (currentUserProfile === null) {
-      console.log("[Dashboard] No profile found, redirecting to /profile");
       setHasCheckedProfile(true);
       setLocation("/profile");
       return;
@@ -97,12 +93,10 @@ export default function Dashboard() {
         !currentUserProfile.current_occupation ||
         !currentUserProfile.time_commitment)
     ) {
-      console.log("[Dashboard] Profile incomplete, redirecting to /profile");
       setHasCheckedProfile(true);
       setLocation("/profile");
     } else if (currentUserProfile) {
       // Profile is complete, mark as checked
-      console.log("[Dashboard] Profile complete, staying on dashboard");
       setHasCheckedProfile(true);
     }
   }, [currentUserProfile, user, authLoading, hasCheckedProfile, setLocation]);
@@ -201,6 +195,14 @@ export default function Dashboard() {
               </span>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
+              <Button
+                variant="outline"
+                onClick={() => setFeedbackDialogOpen(true)}
+                className="lowercase text-xs h-8 px-2 sm:text-sm sm:h-9 sm:px-3"
+              >
+                <MessageSquare className="h-3 w-3 mr-1 sm:h-4 sm:w-4" />
+                <span>feedback</span>
+              </Button>
               <Button
                 variant="outline"
                 onClick={() => setLocation("/profile")}
@@ -679,6 +681,11 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
+
+      <FeedbackDialog
+        open={feedbackDialogOpen}
+        onOpenChange={setFeedbackDialogOpen}
+      />
     </>
   );
 }

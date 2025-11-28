@@ -20,6 +20,59 @@ export const appRouter = router({
     }),
   }),
 
+  // Feedback operations
+  feedback: router({
+    // Protected endpoint - users can submit feedback
+    submit: protectedProcedure
+      .input(
+        z.object({
+          content: z.string().min(10).max(5000),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const client = supabaseDb.getSupabaseClientForUser(
+          ctx.user.accessToken
+        );
+
+        if (!client) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Database connection failed",
+          });
+        }
+
+        // Insert feedback - RLS and trigger will handle validation
+        const { data, error } = await client
+          .from("feedback")
+          .insert({
+            user_id: ctx.user.id,
+            content: input.content,
+            status: "unread",
+          })
+          .select()
+          .single();
+
+        if (error) {
+          // Check for daily limit error from trigger
+          if (error.message?.includes("limit reached")) {
+            throw new TRPCError({
+              code: "TOO_MANY_REQUESTS",
+              message:
+                "Feedback limit reached. Maximum 5 feedbacks per day allowed.",
+            });
+          }
+
+          console.error("[Feedback] Failed to submit:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to submit feedback",
+          });
+        }
+
+        return { success: true, id: data.id };
+      }),
+  }),
+
   // Founder profile operations
   profile: router({
     // Public endpoint - anyone can view profiles
