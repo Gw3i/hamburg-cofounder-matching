@@ -1,31 +1,6 @@
-import { useState, useEffect } from "react";
-import { useSupabaseAuth } from "@/contexts/SupabaseAuthContext";
-import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DotGridBackground } from "@/components/DotGridBackground";
-import { APP_TITLE } from "@/const";
 import { LogoIcon } from "@/components/LogoIcon";
-import { useLocation } from "wouter";
-import { toast } from "sonner";
-import { Upload, X, Code, Lightbulb, Trash2, Download } from "lucide-react";
+import { SkillPicker } from "@/components/SkillPicker";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,7 +12,42 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { SkillPicker } from "@/components/SkillPicker";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { APP_TITLE } from "@/const";
+import { useSupabaseAuth } from "@/contexts/SupabaseAuthContext";
+import { trpc } from "@/lib/trpc";
+import {
+  Briefcase,
+  Code,
+  Download,
+  Lightbulb,
+  Search,
+  Trash2,
+  Upload,
+  User,
+  X,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useLocation } from "wouter";
 
 export default function Profile() {
   const { user, session, loading: authLoading, signOut } = useSupabaseAuth();
@@ -274,7 +284,7 @@ export default function Profile() {
       <DotGridBackground />
 
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <button
             onClick={() => setLocation("/")}
@@ -302,31 +312,52 @@ export default function Profile() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 sm:py-8 max-w-2xl relative z-10">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl sm:text-2xl">
-              your founder profile
-            </CardTitle>
-            <CardDescription className="text-sm sm:text-base">
-              {!profile?.profile_completed ? (
-                <span className="text-primary font-medium">
-                  👋 welcome! complete your profile to start browsing founders
-                  in hamburg
-                </span>
-              ) : (
-                "tell us about yourself so we can help you find the perfect co-founder"
-              )}
-            </CardDescription>
+        {/* Page Header with Progress */}
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+            your founder profile
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mb-4">
+            {!profile?.profile_completed ? (
+              <span className="text-primary font-medium">
+                👋 welcome! complete your profile to start browsing founders in
+                hamburg
+              </span>
+            ) : (
+              "tell us about yourself so we can help you find the perfect co-founder"
+            )}
+          </p>
 
-            {/* Profile Completion Progress */}
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">
-                  profile completion
-                </span>
-                <span className="font-medium">
-                  {(() => {
-                    const totalFields = 9; // name, age, occupation, commitment, skills, skill_areas, looking_for, photo, linkedin
+          {/* Profile Completion Progress */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">profile completion</span>
+              <span className="font-medium">
+                {(() => {
+                  const totalFields = 9; // name, age, occupation, commitment, skills, skill_areas, looking_for, photo, linkedin
+                  let filledFields = 0;
+                  if (name) filledFields++;
+                  if (age) filledFields++;
+                  if (currentOccupation) filledFields++;
+                  if (timeCommitment) filledFields++;
+                  if (skills) filledFields++;
+                  if (skillAreas.length > 0) filledFields++;
+                  if (lookingFor) filledFields++;
+                  if (photoUrl || photoPreview) filledFields++;
+                  if (linkedIn) filledFields++;
+                  const percentage = Math.round(
+                    (filledFields / totalFields) * 100
+                  );
+                  return `${percentage}% (${filledFields}/${totalFields} fields)`;
+                })()}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-blue-600 h-full transition-all duration-300"
+                style={{
+                  width: `${(() => {
+                    const totalFields = 9;
                     let filledFields = 0;
                     if (name) filledFields++;
                     if (age) filledFields++;
@@ -337,38 +368,25 @@ export default function Profile() {
                     if (lookingFor) filledFields++;
                     if (photoUrl || photoPreview) filledFields++;
                     if (linkedIn) filledFields++;
-                    const percentage = Math.round(
-                      (filledFields / totalFields) * 100
-                    );
-                    return `${percentage}% (${filledFields}/${totalFields} fields)`;
-                  })()}
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div
-                  className="bg-blue-600 h-full transition-all duration-300"
-                  style={{
-                    width: `${(() => {
-                      const totalFields = 9;
-                      let filledFields = 0;
-                      if (name) filledFields++;
-                      if (age) filledFields++;
-                      if (currentOccupation) filledFields++;
-                      if (timeCommitment) filledFields++;
-                      if (skills) filledFields++;
-                      if (skillAreas.length > 0) filledFields++;
-                      if (lookingFor) filledFields++;
-                      if (photoUrl || photoPreview) filledFields++;
-                      if (linkedIn) filledFields++;
-                      return Math.round((filledFields / totalFields) * 100);
-                    })()}%`,
-                  }}
-                />
-              </div>
+                    return Math.round((filledFields / totalFields) * 100);
+                  })()}%`,
+                }}
+              />
             </div>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Card 1: Profile Basics */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5" />
+                <span className="font-bold">profile basics</span>
+              </CardTitle>
+              <CardDescription>your essential information</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               {/* Photo Upload */}
               <div className="space-y-2">
                 <Label>profile photo</Label>
@@ -383,9 +401,9 @@ export default function Profile() {
                       <button
                         type="button"
                         onClick={handleRemovePhoto}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        className="absolute -top-1 -right-1 bg-gray-500 text-white rounded-full p-0.5 hover:bg-gray-600"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3 h-3" />
                       </button>
                     </div>
                   ) : (
@@ -435,6 +453,85 @@ export default function Profile() {
                 </div>
               </div>
 
+              {/* LinkedIn */}
+              <div className="space-y-2">
+                <Label htmlFor="linkedIn">linkedin profile</Label>
+                <Input
+                  id="linkedIn"
+                  type="url"
+                  value={linkedIn}
+                  onChange={e => setLinkedIn(e.target.value)}
+                  placeholder="https://linkedin.com/in/yourprofile"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 2: About Me */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Briefcase className="w-5 h-5" />
+                <span className="font-bold">about me</span>
+              </CardTitle>
+              <CardDescription>
+                tell potential cofounders who you are and what you bring to the
+                table
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Current Occupation */}
+              <div className="space-y-2">
+                <Label htmlFor="current_occupation">current situation *</Label>
+                <Select
+                  value={currentOccupation}
+                  onValueChange={(value: any) => setCurrentOccupation(value)}
+                >
+                  <SelectTrigger id="current_occupation">
+                    <SelectValue placeholder="select your current situation" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="student">student</SelectItem>
+                    <SelectItem value="working_full_time">
+                      working full-time (at a company)
+                    </SelectItem>
+                    <SelectItem value="working_part_time_on_idea">
+                      working part-time on my idea
+                    </SelectItem>
+                    <SelectItem value="working_full_time_on_idea">
+                      working full-time on my idea
+                    </SelectItem>
+                    <SelectItem value="between_jobs">between jobs</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Time Commitment */}
+              <div className="space-y-2">
+                <Label htmlFor="time_commitment">
+                  time commitment i can offer *
+                </Label>
+                <Select
+                  value={timeCommitment}
+                  onValueChange={(value: any) => setTimeCommitment(value)}
+                >
+                  <SelectTrigger id="time_commitment">
+                    <SelectValue placeholder="select your time commitment" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full_time">
+                      full-time (40+ hours/week)
+                    </SelectItem>
+                    <SelectItem value="part_time">
+                      part-time (20-40 hours/week)
+                    </SelectItem>
+                    <SelectItem value="exploring">
+                      exploring (&lt;20 hours/week)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Key Attributes */}
               <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <h3 className="font-semibold text-sm flex items-center gap-2">
@@ -474,56 +571,6 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Current Occupation */}
-              <div className="space-y-2">
-                <Label htmlFor="current_occupation">current situation *</Label>
-                <Select
-                  value={currentOccupation}
-                  onValueChange={(value: any) => setCurrentOccupation(value)}
-                >
-                  <SelectTrigger id="current_occupation">
-                    <SelectValue placeholder="select your current situation" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="student">student</SelectItem>
-                    <SelectItem value="working_full_time">
-                      working full-time (at a company)
-                    </SelectItem>
-                    <SelectItem value="working_part_time_on_idea">
-                      working part-time on my idea
-                    </SelectItem>
-                    <SelectItem value="working_full_time_on_idea">
-                      working full-time on my idea
-                    </SelectItem>
-                    <SelectItem value="between_jobs">between jobs</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Time Commitment */}
-              <div className="space-y-2">
-                <Label htmlFor="time_commitment">time commitment *</Label>
-                <Select
-                  value={timeCommitment}
-                  onValueChange={(value: any) => setTimeCommitment(value)}
-                >
-                  <SelectTrigger id="time_commitment">
-                    <SelectValue placeholder="select your time commitment" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="full_time">
-                      full-time (40+ hours/week)
-                    </SelectItem>
-                    <SelectItem value="part_time">
-                      part-time (20-40 hours/week)
-                    </SelectItem>
-                    <SelectItem value="exploring">
-                      exploring (&lt;20 hours/week)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               {/* Skill Areas */}
               <div className="space-y-2">
                 <Label>skill areas (select all that apply) *</Label>
@@ -533,9 +580,27 @@ export default function Profile() {
                 />
               </div>
 
+              {/* Skills */}
+              <div className="space-y-2">
+                <Label htmlFor="skills">
+                  my skills & experience *
+                  <span className="text-muted-foreground font-normal text-xs ml-2">
+                    (what you bring to the table)
+                  </span>
+                </Label>
+                <Textarea
+                  id="skills"
+                  value={skills}
+                  onChange={e => setSkills(e.target.value)}
+                  placeholder="describe your own skills and experience, e.g., React, Python, Machine Learning, B2B Sales, 5 years in fintech..."
+                  rows={3}
+                  required
+                />
+              </div>
+
               {/* Idea */}
               <div className="space-y-2">
-                <Label htmlFor="idea">your idea {hasIdea && "*"}</Label>
+                <Label htmlFor="idea">my startup idea {hasIdea && "*"}</Label>
                 <Textarea
                   id="idea"
                   value={idea}
@@ -549,58 +614,63 @@ export default function Profile() {
                   required={hasIdea}
                 />
               </div>
+            </CardContent>
+          </Card>
 
+          {/* Card 3: What I'm Looking For */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="w-5 h-5" />
+                <span className="font-bold">what i'm looking for</span>
+              </CardTitle>
+              <CardDescription>
+                describe your ideal cofounder and what you need
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               {/* Looking For */}
               <div className="space-y-2">
                 <Label htmlFor="lookingFor">
-                  what i'm looking for in a co-founder *
+                  what i'm looking for in a cofounder *
                 </Label>
                 <Textarea
                   id="lookingFor"
                   value={lookingFor}
                   onChange={e => setLookingFor(e.target.value)}
-                  placeholder="e.g., technical co-founder with experience in AI/ML..."
-                  rows={3}
+                  placeholder="e.g., technical co-founder with experience in AI/ML, someone who can commit full-time, has experience with B2B SaaS..."
+                  rows={4}
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  be specific about the skills, experience, and commitment level
+                  you're seeking
+                </p>
               </div>
+            </CardContent>
+          </Card>
 
-              {/* Skills */}
-              <div className="space-y-2">
-                <Label htmlFor="skills">specific skills & experience *</Label>
-                <Textarea
-                  id="skills"
-                  value={skills}
-                  onChange={e => setSkills(e.target.value)}
-                  placeholder="e.g., React, Python, Machine Learning, B2B Sales..."
-                  rows={3}
-                  required
-                />
-              </div>
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={loading || uploadingPhoto}
+          >
+            {loading || uploadingPhoto ? "saving..." : "save profile"}
+          </Button>
+        </form>
 
-              {/* LinkedIn */}
-              <div className="space-y-2">
-                <Label htmlFor="linkedIn">linkedin profile</Label>
-                <Input
-                  id="linkedIn"
-                  type="url"
-                  value={linkedIn}
-                  onChange={e => setLinkedIn(e.target.value)}
-                  placeholder="https://linkedin.com/in/yourprofile"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={loading || uploadingPhoto}
-              >
-                {loading || uploadingPhoto ? "saving..." : "save profile"}
-              </Button>
-            </form>
-
+        {/* Account Management Card */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>account management</CardTitle>
+            <CardDescription>
+              export your data or manage your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
             {/* Data Export Section */}
-            <div className="mt-8 pt-6 border-t">
+            <div>
               <h3 className="text-sm font-semibold mb-2 lowercase">
                 data portability
               </h3>
@@ -659,7 +729,7 @@ export default function Profile() {
             </div>
 
             {/* Delete Account Section */}
-            <div className="mt-8 pt-6 border-t">
+            <div className="pt-6 border-t">
               <h3 className="text-sm font-semibold text-destructive mb-2 lowercase">
                 danger zone
               </h3>
@@ -670,8 +740,8 @@ export default function Profile() {
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
-                    variant="destructive"
-                    className="w-full"
+                    variant="outline"
+                    className="w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
                     disabled={deleting}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
