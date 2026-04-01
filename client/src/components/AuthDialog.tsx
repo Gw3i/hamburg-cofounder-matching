@@ -18,20 +18,26 @@ interface AuthDialogProps {
 }
 
 export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const [confirmedEmail, setConfirmedEmail] = useState("");
-  const { signInWithEmail, signUpWithEmail } = useSupabaseAuth();
+  const { signInWithEmail, signUpWithEmail, resetPasswordForEmail } =
+    useSupabaseAuth();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      if (mode === "signin") {
+      if (mode === "forgot") {
+        await resetPasswordForEmail(email);
+        setConfirmedEmail(email);
+        setShowEmailConfirmation(true);
+        setEmail("");
+      } else if (mode === "signin") {
         await signInWithEmail(email, password);
         toast.success("signed in successfully");
         onOpenChange(false);
@@ -85,7 +91,9 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                 check your email
               </DialogTitle>
               <DialogDescription className="lowercase text-sm sm:text-base">
-                we've sent a confirmation link to:
+                {mode === "forgot"
+                  ? "we've sent a password reset link to:"
+                  : "we've sent a confirmation link to:"}
               </DialogDescription>
             </DialogHeader>
 
@@ -95,8 +103,9 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
               </p>
 
               <p className="text-center text-sm text-muted-foreground lowercase">
-                please click the link in the email to verify your account and
-                complete registration.
+                {mode === "forgot"
+                  ? "please click the link in the email to reset your password."
+                  : "please click the link in the email to verify your account and complete registration."}
               </p>
 
               <Button
@@ -113,12 +122,18 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           <>
             <DialogHeader className="space-y-2">
               <DialogTitle className="lowercase text-lg sm:text-xl">
-                {mode === "signin" ? "sign in" : "create account"}
+                {mode === "signin"
+                  ? "sign in"
+                  : mode === "signup"
+                    ? "create account"
+                    : "reset password"}
               </DialogTitle>
               <DialogDescription className="lowercase text-sm sm:text-base">
                 {mode === "signin"
                   ? "sign in to find your co-founder"
-                  : "create an account to get started"}
+                  : mode === "signup"
+                    ? "create an account to get started"
+                    : "enter your email to receive a reset link"}
               </DialogDescription>
             </DialogHeader>
 
@@ -140,22 +155,24 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                 />
               </div>
 
-              {/* Password Input - Mobile optimized */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="password" className="lowercase text-sm">
-                  password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="lowercase placeholder:lowercase h-10 text-sm sm:h-11 sm:text-base"
-                />
-              </div>
+              {/* Password Input - Hidden in forgot mode */}
+              {mode !== "forgot" && (
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="password" className="lowercase text-sm">
+                    password
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    className="lowercase placeholder:lowercase h-10 text-sm sm:h-11 sm:text-base"
+                  />
+                </div>
+              )}
 
               {/* Submit Button - Proper touch target */}
               <Button
@@ -167,26 +184,48 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   ? "loading..."
                   : mode === "signin"
                     ? "sign in"
-                    : "sign up"}
+                    : mode === "signup"
+                      ? "sign up"
+                      : "send reset link"}
               </Button>
             </form>
 
-            {/* Toggle Mode Link - Mobile optimized touch target */}
-            <div className="text-center text-sm pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setMode(mode === "signin" ? "signup" : "signin");
-                  setShowEmailConfirmation(false);
-                  setConfirmedEmail("");
-                }}
-                className="text-muted-foreground hover:text-foreground lowercase underline-offset-4 hover:underline py-2 px-1 min-h-[44px] inline-flex items-center"
-                disabled={loading}
-              >
-                {mode === "signin"
-                  ? "don't have an account? sign up"
-                  : "already have an account? sign in"}
-              </button>
+            {/* Toggle Mode Links */}
+            <div className="text-center text-sm pt-2 space-y-1">
+              {mode === "signin" && (
+                <button
+                  type="button"
+                  onClick={() => setMode("forgot")}
+                  className="text-muted-foreground hover:text-foreground lowercase underline-offset-4 hover:underline py-1 px-1 min-h-[44px] inline-flex items-center"
+                  disabled={loading}
+                >
+                  forgot password?
+                </button>
+              )}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode(
+                      mode === "forgot"
+                        ? "signin"
+                        : mode === "signin"
+                          ? "signup"
+                          : "signin"
+                    );
+                    setShowEmailConfirmation(false);
+                    setConfirmedEmail("");
+                  }}
+                  className="text-muted-foreground hover:text-foreground lowercase underline-offset-4 hover:underline py-1 px-1 min-h-[44px] inline-flex items-center"
+                  disabled={loading}
+                >
+                  {mode === "forgot"
+                    ? "back to sign in"
+                    : mode === "signin"
+                      ? "don't have an account? sign up"
+                      : "already have an account? sign in"}
+                </button>
+              </div>
             </div>
           </>
         )}

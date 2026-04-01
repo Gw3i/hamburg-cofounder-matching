@@ -9,7 +9,8 @@ interface SupabaseAuthContextType {
   error: AuthError | null;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
-
+  resetPasswordForEmail: (email: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -75,6 +76,28 @@ export function SupabaseAuthProvider({
     }
   };
 
+  /** Sends a password reset email via Supabase, redirecting back to /reset-password */
+  const resetPasswordForEmail = async (email: string) => {
+    setError(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      setError(error);
+      throw error;
+    }
+  };
+
+  /** Updates the current user's password (requires an active recovery session) */
+  const updatePassword = async (password: string) => {
+    setError(null);
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      setError(error);
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     setError(null);
     const { error } = await supabase.auth.signOut();
@@ -93,6 +116,8 @@ export function SupabaseAuthProvider({
         error,
         signInWithEmail,
         signUpWithEmail,
+        resetPasswordForEmail,
+        updatePassword,
         signOut,
       }}
     >
